@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .board {
+            display: inline-block;
+            border-collapse: collapse;
+        }
+        .board td {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #000;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-selector {
+            margin-top: 20px;
+        }
+        .theme-selector button {
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .theme-selector button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <table class="board">
+            <tr>
+                <td id="cell-0"></td>
+                <td id="cell-1"></td>
+                <td id="cell-2"></td>
+            </tr>
+            <tr>
+                <td id="cell-3"></td>
+                <td id="cell-4"></td>
+                <td id="cell-5"></td>
+            </tr>
+            <tr>
+                <td id="cell-6"></td>
+                <td id="cell-7"></td>
+                <td id="cell-8"></td>
+            </tr>
+        </table>
+        <p id="message"></p>
+        <div class="theme-selector">
+            <button onclick="setTheme('default')">Default Theme</button>
+            <button onclick="setTheme('dark')">Dark Theme</button>
+            <button onclick="setTheme('light')">Light Theme</button>
+        </div>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameActive = true;
+        const cells = document.querySelectorAll('.board td');
+        const message = document.getElementById('message');
+        const themes = {
+            default: { background: '#fff', textColor: '#000' },
+            dark: { background: '#333', textColor: '#fff' },
+            light: { background: '#f8f8f8', textColor: '#333' }
+        };
+
+        function handleCellClick(cell) {
+            const cellIndex = parseInt(cell.id.split('-')[1]);
+            if (gameActive && !cell.textContent) {
+                cell.textContent = currentPlayer;
+                cell.style.color = themes[currentTheme].textColor;
+                if (checkWin()) {
+                    gameActive = false;
+                    message.textContent = `Player ${currentPlayer} wins!`;
+                } else if (checkDraw()) {
+                    gameActive = false;
+                    message.textContent = "It's a draw!";
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
+        }
+
+        function checkWin() {
+            const winningConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]             // Diagonals
+            ];
+            return winningConditions.some(combination =>
+                combination.every(index =>
+                    cells[index].textContent === currentPlayer
+                )
+            );
+        }
+
+        function checkDraw() {
+            return [...cells].every(cell => cell.textContent);
+        }
+
+        function resetGame() {
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.style.color = themes[currentTheme].textColor;
+            });
+            currentPlayer = 'X';
+            gameActive = true;
+            message.textContent = '';
+        }
+
+        let currentTheme = 'default';
+        function setTheme(theme) {
+            currentTheme = theme;
+            const themeColors = themes[theme];
+            document.body.style.backgroundColor = themeColors.background;
+            document.body.style.color = themeColors.textColor;
+        }
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => handleCellClick(cell));
+        });
+
+        // Add sound effects
+        const clickSound = new Audio('click.mp3');
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => clickSound.play());
+        });
+    </script>
+</body>
+</html>
